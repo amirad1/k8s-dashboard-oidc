@@ -1,0 +1,8 @@
+version: '3'
+services:
+  your-nginx-service:
+    image: nginx
+    volumes:
+      - ./path/to/your/html:/usr/share/nginx/html
+    ports:
+      - "80:80"

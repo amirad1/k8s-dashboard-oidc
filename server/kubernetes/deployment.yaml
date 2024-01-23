@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard-api-deployment
+  namespace: kubernetes-dashboard
+spec:
+  selector:
+    matchLabels:
+      app: dashboard-api
+  template:
+    metadata:
+      labels:
+        app: dashboard-api
+    spec:
+      containers:
+      - name: dashboard-api
+        image: registry.galaxy.tiddev.com/galaxy/dashboard-oidc-api:community
+        ports:
+        - containerPort: 4000
+        env:
+        - name: CLIENT_ID
+          value: gatekeeper  #this is an example
+        - name: CLIENT_SECRET
+          value: VvISxPZP2iXiJVx33A8cE2pTZr8zfkDq #this is an example
+        - name: OIDC_URL
+          value: https://keycloak.local/auth/realms/local/protocol/openid-connect/token #this is an example
+      hostAliases:
+      - hostnames:
+        - "keycloak.local" #this is an example
+        ip: "192.168.102.51" #this is an example
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard-api
+  namespace: kubernetes-dashboard
+spec:
+  selector:
+    app: dashboard-api
+  ports:
+  - port: 4000
+    targetPort: 4000

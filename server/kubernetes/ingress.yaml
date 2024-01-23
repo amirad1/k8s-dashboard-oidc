@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-oauth2-server
+  namespace: kubernetes-dashboard
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: tracing.local
+    http:
+      paths:
+      - backend:
+          service:
+            name: dashboard-api
+            port:
+              number: 4000
+        path: /
+        pathType: Prefix

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard-login-auth
+  namespace: kubernetes-dashboard
+spec:
+  selector:
+    matchLabels:
+      app: dashboard-login-auth
+  template:
+    metadata:
+      labels:
+        app: dashboard-login-auth
+    spec:
+      containers:
+      - name: dashboard-login-auth
+        image: registry.galaxy.tiddev.com/dashboard-login-auth:community
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard-login-auth
+  namespace: kubernetes-dashboard
+spec:
+  selector:
+    app: dashboard-login-auth
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30254
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dashboard-oauth2
+  namespace: kubernetes-dashboard
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: admingateway.preuat.galaxy.tiddev.com
+    http:
+      paths:
+      - backend:
+          service:
+            name: dashboard-login-auth
+            port:
+              number: 80
+        path: /
+        pathType: Prefix

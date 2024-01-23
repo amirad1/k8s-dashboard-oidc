@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  auth-api:
+    image: <img-name>
+    container_name: auth-api
+    environments:
+    - CLIENT_ID=<id>
+    - CLIENT_SECRET=<secret>
+    - OIDC_URL=<url>
+    - NODE_TLS_REJECT_UNAUTHORIZED=0
+    ports:
+    - 4000:4000

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" href="./icon2.png">
+    <title>Kubernetes Authenticator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            display: block;
+            margin: 0 auto;
+            max-width: 200px;
+            padding-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .output {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            background-color: #f9f9f9;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            font-size: 12px;
+            align-self: flex-start;
+        }
+
+        .output-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+        }
+
+        .dashboard-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script src="axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <img class="logo" src="Kubernetes_logo_without_workmark.svg.png" alt="Kubernetes Logo">
+        <h1>Kubernetes Authenticator</h1>
+        <label for="username">Username:</label>
+        <input type="text" id="username" placeholder="Enter your username" />
+        <label for="password">Password:</label>
+        <input type="password" id="password" placeholder="Enter your password" />
+        <button id="fetchButton">Fetch Token</button>
+        <div class="output">
+            <p class="output-header">Token Response:</p>
+            <pre id="output-content"></pre>
+            <button id="copyButton">Copy access_token</button>
+        </div>
+        <button class="dashboard-button" onclick="openKubernetesDashboard()">Open Kubernetes Dashboard</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const fetchButton = document.getElementById("fetchButton");
+            const outputContentElement = document.getElementById("output-content");
+            const copyButton = document.getElementById("copyButton");
+            const usernameInput = document.getElementById("username");
+            const passwordInput = document.getElementById("password");
+	    const config = {
+		  headers:{
+		    'Content-Type': 'application/json'
+		  }
+	};
+
+            fetchButton.addEventListener("click", function() {
+                const scope = "openid";
+                const oidc_url = "https://tracing.preuat.galaxy.tiddev.com/get-token"; // API endpoint on your server to get the token
+
+//                const data = new URLSearchParams();
+//                data.append("grant_type", "password");
+//                data.append("scope", scope);
+  //              data.append("username", usernameInput.value);
+    //            data.append("password", passwordInput.value);
+
+		const body =                
+			{
+			    username : usernameInput.value,
+			    password : passwordInput.value
+
+				}                
+
+                axios
+                    .post(oidc_url, body, config)
+                    .then(response => {
+                        const idToken = response.data.access_token;
+                        const formattedIdToken = formatIdToken(idToken);
+                        outputContentElement.textContent = formattedIdToken;
+                        copyButton.style.display = "block";
+                        copyButton.dataset.value = formattedIdToken;
+                    })
+                    .catch(error => {
+                        outputContentElement.textContent = "Error: " + error.message;
+                        copyButton.style.display = "none";
+                    });
+            });
+
+            copyButton.addEventListener("click", function() {
+                const valueToCopy = copyButton.dataset.value;
+                const tempInput = document.createElement("input");
+                document.body.appendChild(tempInput);
+                tempInput.value = valueToCopy;
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+                copyButton.textContent = "Copied!";
+                setTimeout(() => {
+                    copyButton.textContent = "Copy access_token";
+                }, 1000);
+            });
+
+            function formatIdToken(idToken) {
+                const maxLength = 60; // Adjust the maximum length per line as needed
+                const regex = new RegExp(`.{1,${maxLength}}`, 'g');
+                return idToken.match(regex).join('\n');
+            }
+        });
+
+        function openKubernetesDashboard() {
+            // Replace the URL with the actual URL of your Kubernetes dashboard
+            window.location.href = "https://dashboard.preuat.galaxy.tiddev.com/#/login";
+        }
+    </script>
+</body>
+</html>
+
+
+
