@@ -40,8 +40,8 @@ app.post('/get-token', async (req, res) => {
         console.log('Response Data:', response.data);
 
         // Send the ID token as the response
-        const idToken = response.data.access_token;
-        res.json({ access_token: idToken });
+        const idToken = response.data.id_token;
+        res.json({ id_token: idToken });
     } catch (error) {
         console.log('Catching error');
         console.error('Error:', error);
