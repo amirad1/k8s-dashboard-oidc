@@ -3,3 +3,4 @@ This dashboard helps you authenticate on kubernetes dashboard via keycloak as oi
 - deploy server app with kubernetes or docker-compose
 - create frontend image with dockerfile
 - deploy frontend using docker-compose
+d f f
